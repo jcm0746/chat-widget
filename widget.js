@@ -2,78 +2,65 @@
   const script = document.currentScript;
 
   const webhook = script.getAttribute("data-webhook");
-  const color = script.getAttribute("data-color") || "#C49D68";
   const name = script.getAttribute("data-name") || "Assistant";
 
   const sessionId = Math.random().toString(36).substring(2);
 
-  // ===== BUBBLE (NEW ICON) =====
+  // ===== BUBBLE (MINIMAL ICON) =====
   const bubble = document.createElement("div");
   bubble.innerHTML = "✦";
   bubble.style = `
     position:fixed;
     bottom:20px;
     right:20px;
-    width:64px;
-    height:64px;
+    width:60px;
+    height:60px;
     border-radius:50%;
-    background:#C49D68;
+    background:black;
     color:white;
     display:flex;
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    font-size:24px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.3);
-    transition:transform 0.2s ease;
+    font-size:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
     z-index:9999;
   `;
-  bubble.onmouseenter = () => bubble.style.transform = "scale(1.1)";
-  bubble.onmouseleave = () => bubble.style.transform = "scale(1)";
   document.body.appendChild(bubble);
 
   // ===== CHAT BOX =====
   const box = document.createElement("div");
   box.style = `
     position:fixed;
-    bottom:100px;
+    bottom:90px;
     right:20px;
     width:360px;
     height:520px;
     background:white;
-    border-radius:18px;
-    box-shadow:0 25px 70px rgba(0,0,0,0.35);
+    border-radius:16px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.2);
     display:none;
     flex-direction:column;
     overflow:hidden;
     z-index:9999;
   `;
 
-  // ===== HEADER WITH CLEAN AVATAR =====
+  // ===== CLEAN HEADER =====
   const header = document.createElement("div");
   header.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="
-        width:34px;
-        height:34px;
-        border-radius:50%;
-        background:linear-gradient(135deg,#C49D68, #60a5fa);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:white;
-        font-size:14px;
-      ">✦</div>
-      <div>
-        <div style="font-weight:600;">${name}</div>
-        <div style="font-size:12px;opacity:0.8;">Online now</div>
-      </div>
+    <div style="
+      text-align:center;
+      font-size:16px;
+      font-weight:500;
+      color:black;
+    ">
+      ${name}
     </div>
   `;
   header.style = `
-    background:#C49D68;
-    color:white;
-    padding:14px;
+    padding:16px;
+    border-bottom:1px solid #eee;
+    background:white;
   `;
 
   // ===== MESSAGES =====
@@ -85,7 +72,7 @@
     display:flex;
     flex-direction:column;
     gap:10px;
-    background:#f5f7fb;
+    background:white;
   `;
 
   // ===== INPUT =====
@@ -94,6 +81,7 @@
     display:flex;
     padding:10px;
     border-top:1px solid #eee;
+    background:white;
   `;
 
   const input = document.createElement("input");
@@ -101,8 +89,9 @@
   input.style = `
     flex:1;
     padding:10px;
-    border-radius:10px;
+    border-radius:8px;
     border:1px solid #ddd;
+    outline:none;
   `;
 
   const btn = document.createElement("button");
@@ -111,8 +100,8 @@
     margin-left:8px;
     padding:10px 14px;
     border:none;
-    border-radius:10px;
-    background:#C49D68;
+    border-radius:8px;
+    background:black;
     color:white;
     cursor:pointer;
   `;
@@ -141,52 +130,25 @@
     const msg = document.createElement("div");
 
     msg.style = `
-      display:flex;
-      align-items:flex-end;
-      gap:6px;
       max-width:80%;
-      ${type === "user" ? "align-self:flex-end;" : ""}
-    `;
-
-    if (type === "bot") {
-      const avatar = document.createElement("div");
-      avatar.innerHTML = "✦";
-      avatar.style = `
-        width:30px;
-        height:30px;
-        border-radius:50%;
-        background:linear-gradient(135deg, #C49D68, #60a5fa);
-        color:white;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:12px;
-      `;
-      msg.appendChild(avatar);
-    }
-
-    const bubble = document.createElement("div");
-    bubble.innerText = text;
-
-    bubble.style = `
       padding:10px 12px;
-      border-radius:12px;
+      border-radius:10px;
       font-size:14px;
-      background:${type === "user" ? color : "white"};
-      color:${type === "user" ? "white" : "black"};
-      border:${type === "bot" ? "1px solid #eee" : "none"};
+      ${type === "user"
+        ? "align-self:flex-end;background:black;color:white;"
+        : "align-self:flex-start;background:#f5f5f5;color:black;"}
     `;
 
-    msg.appendChild(bubble);
-    messages.appendChild(msg);
+    msg.innerText = text;
 
+    messages.appendChild(msg);
     msg.scrollIntoView({ behavior: "smooth" });
   }
 
-  // ===== REAL TYPING DOTS ANIMATION =====
+  // ===== TYPING DOTS =====
   function showTyping() {
     const wrapper = document.createElement("div");
-    wrapper.style = "display:flex;align-items:center;gap:6px;";
+    wrapper.style = "display:flex;gap:6px;";
 
     const dot = () => {
       const d = document.createElement("div");
@@ -216,12 +178,11 @@
     return wrapper;
   }
 
-  // inject animation
   const style = document.createElement("style");
   style.innerHTML = `
     @keyframes blink {
-      0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
-      40% { opacity: 1; transform: scale(1.3); }
+      0%, 80%, 100% { opacity: 0.3; }
+      40% { opacity: 1; }
     }
   `;
   document.head.appendChild(style);
