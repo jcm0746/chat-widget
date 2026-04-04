@@ -7,9 +7,9 @@
 
   const sessionId = Math.random().toString(36).substring(2);
 
-  // ===== BUBBLE =====
+  // ===== BUBBLE (NEW ICON) =====
   const bubble = document.createElement("div");
-  bubble.innerHTML = "💬";
+  bubble.innerHTML = "✦";
   bubble.style = `
     position:fixed;
     bottom:20px;
@@ -23,10 +23,13 @@
     justify-content:center;
     align-items:center;
     cursor:pointer;
-    font-size:26px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    font-size:24px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    transition:transform 0.2s ease;
     z-index:9999;
   `;
+  bubble.onmouseenter = () => bubble.style.transform = "scale(1.1)";
+  bubble.onmouseleave = () => bubble.style.transform = "scale(1)";
   document.body.appendChild(bubble);
 
   // ===== CHAT BOX =====
@@ -38,29 +41,29 @@
     width:360px;
     height:520px;
     background:white;
-    border-radius:16px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    border-radius:18px;
+    box-shadow:0 25px 70px rgba(0,0,0,0.35);
     display:none;
     flex-direction:column;
     overflow:hidden;
     z-index:9999;
   `;
 
-  // ===== HEADER =====
+  // ===== HEADER WITH CLEAN AVATAR =====
   const header = document.createElement("div");
   header.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;">
       <div style="
-        width:36px;
-        height:36px;
+        width:34px;
+        height:34px;
         border-radius:50%;
-        background:white;
-        color:${color};
+        background:linear-gradient(135deg, ${color}, #60a5fa);
         display:flex;
         align-items:center;
         justify-content:center;
-        font-weight:bold;
-      ">AI</div>
+        color:white;
+        font-size:14px;
+      ">✦</div>
       <div>
         <div style="font-weight:600;">${name}</div>
         <div style="font-size:12px;opacity:0.8;">Online now</div>
@@ -70,7 +73,7 @@
   header.style = `
     background:${color};
     color:white;
-    padding:12px;
+    padding:14px;
   `;
 
   // ===== MESSAGES =====
@@ -147,17 +150,17 @@
 
     if (type === "bot") {
       const avatar = document.createElement("div");
-      avatar.innerHTML = "AI";
+      avatar.innerHTML = "✦";
       avatar.style = `
-        width:28px;
-        height:28px;
+        width:30px;
+        height:30px;
         border-radius:50%;
-        background:${color};
+        background:linear-gradient(135deg, ${color}, #60a5fa);
         color:white;
-        font-size:12px;
         display:flex;
         align-items:center;
         justify-content:center;
+        font-size:12px;
       `;
       msg.appendChild(avatar);
     }
@@ -180,19 +183,48 @@
     msg.scrollIntoView({ behavior: "smooth" });
   }
 
+  // ===== REAL TYPING DOTS ANIMATION =====
   function showTyping() {
     const wrapper = document.createElement("div");
-    wrapper.style = "display:flex;gap:6px;align-items:center;";
+    wrapper.style = "display:flex;align-items:center;gap:6px;";
 
-    const dots = document.createElement("div");
-    dots.innerHTML = "● ● ●";
-    dots.style = "opacity:0.5;";
+    const dot = () => {
+      const d = document.createElement("div");
+      d.style = `
+        width:6px;
+        height:6px;
+        border-radius:50%;
+        background:#999;
+        animation:blink 1.4s infinite;
+      `;
+      return d;
+    };
 
-    wrapper.appendChild(dots);
+    const d1 = dot();
+    const d2 = dot();
+    const d3 = dot();
+
+    d2.style.animationDelay = "0.2s";
+    d3.style.animationDelay = "0.4s";
+
+    wrapper.appendChild(d1);
+    wrapper.appendChild(d2);
+    wrapper.appendChild(d3);
+
     messages.appendChild(wrapper);
 
     return wrapper;
   }
+
+  // inject animation
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
+      40% { opacity: 1; transform: scale(1.3); }
+    }
+  `;
+  document.head.appendChild(style);
 
   async function sendMessage() {
     const text = input.value;
