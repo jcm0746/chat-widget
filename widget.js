@@ -17,7 +17,7 @@
     width:64px;
     height:64px;
     border-radius:50%;
-    background:${color};
+    background:#C49D68;
     color:white;
     display:flex;
     justify-content:center;
@@ -57,7 +57,7 @@
         width:34px;
         height:34px;
         border-radius:50%;
-        background:linear-gradient(135deg, ${color}, #60a5fa);
+        background:linear-gradient(135deg,#C49D68, #60a5fa);
         display:flex;
         align-items:center;
         justify-content:center;
@@ -71,7 +71,7 @@
     </div>
   `;
   header.style = `
-    background:${color};
+    background:#C49D68;
     color:white;
     padding:14px;
   `;
@@ -112,7 +112,7 @@
     padding:10px 14px;
     border:none;
     border-radius:10px;
-    background:${color};
+    background:#C49D68;
     color:white;
     cursor:pointer;
   `;
@@ -155,7 +155,7 @@
         width:30px;
         height:30px;
         border-radius:50%;
-        background:linear-gradient(135deg, ${color}, #60a5fa);
+        background:linear-gradient(135deg, #C49D68, #60a5fa);
         color:white;
         display:flex;
         align-items:center;
