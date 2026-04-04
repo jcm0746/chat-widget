@@ -1,12 +1,12 @@
 (function () {
-  const script = document.currentScript;
+  const name = "Assistant";
 
-  const webhook = script.getAttribute("data-webhook");
-  const name = script.getAttribute("data-name") || "Assistant";
+  // ✅ YOUR NEW WEBHOOK (HARDCODED)
+  const webhook = "https://joemeeter.app.n8n.cloud/webhook/chatbot";
 
   const sessionId = Math.random().toString(36).substring(2);
 
-  // ===== BUBBLE (MINIMAL ICON) =====
+  // ===== BUBBLE =====
   const bubble = document.createElement("div");
   bubble.innerHTML = "✦";
   bubble.style = `
@@ -45,7 +45,7 @@
     z-index:9999;
   `;
 
-  // ===== CLEAN HEADER =====
+  // ===== HEADER =====
   const header = document.createElement("div");
   header.innerHTML = `
     <div style="
@@ -145,7 +145,7 @@
     msg.scrollIntoView({ behavior: "smooth" });
   }
 
-  // ===== TYPING DOTS =====
+  // ===== TYPING =====
   function showTyping() {
     const wrapper = document.createElement("div");
     wrapper.style = "display:flex;gap:6px;";
@@ -209,11 +209,21 @@
       const data = await res.json();
 
       typing.remove();
-      addMessage(data.reply || "No response", "bot");
 
-    } catch {
+      // ✅ HANDLE DIFFERENT N8N RESPONSE FORMATS
+      const reply =
+        data.reply ||
+        data.response ||
+        data.output ||
+        (Array.isArray(data) ? data[0]?.json?.reply : null) ||
+        "No response";
+
+      addMessage(reply, "bot");
+
+    } catch (err) {
       typing.remove();
-      addMessage("Error connecting", "bot");
+      addMessage("Error connecting to server", "bot");
+      console.error(err);
     }
   }
 
