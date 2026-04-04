@@ -2,7 +2,7 @@
   const script = document.currentScript;
 
   const webhook = script.getAttribute("data-webhook");
-  const color = script.getAttribute("data-color") || "#2563eb";
+  const color = script.getAttribute("data-color") || "#C49D68";
   const name = script.getAttribute("data-name") || "Assistant";
 
   const sessionId = Math.random().toString(36).substring(2);
