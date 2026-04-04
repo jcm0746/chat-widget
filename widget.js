@@ -3,7 +3,7 @@
 
   const webhook = script.getAttribute("data-webhook");
   const color = script.getAttribute("data-color") || "#2563eb";
-  const name = script.getAttribute("data-name") || "AI Assistant";
+  const name = script.getAttribute("data-name") || "Assistant";
 
   const sessionId = Math.random().toString(36).substring(2);
 
