@@ -25,13 +25,8 @@
     cursor:pointer;
     font-size:26px;
     box-shadow:0 8px 20px rgba(0,0,0,0.25);
-    transition:transform 0.2s ease;
     z-index:9999;
   `;
-
-  bubble.onmouseenter = () => bubble.style.transform = "scale(1.1)";
-  bubble.onmouseleave = () => bubble.style.transform = "scale(1)";
-
   document.body.appendChild(bubble);
 
   // ===== CHAT BOX =====
@@ -49,19 +44,33 @@
     flex-direction:column;
     overflow:hidden;
     z-index:9999;
-    animation:fadeIn 0.2s ease;
   `;
 
   // ===== HEADER =====
   const header = document.createElement("div");
   header.innerHTML = `
-    <div style="font-size:16px;font-weight:600;">${name}</div>
-    <div style="font-size:12px;opacity:0.8;">Typically replies instantly</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="
+        width:36px;
+        height:36px;
+        border-radius:50%;
+        background:white;
+        color:${color};
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:bold;
+      ">AI</div>
+      <div>
+        <div style="font-weight:600;">${name}</div>
+        <div style="font-size:12px;opacity:0.8;">Online now</div>
+      </div>
+    </div>
   `;
   header.style = `
     background:${color};
     color:white;
-    padding:14px;
+    padding:12px;
   `;
 
   // ===== MESSAGES =====
@@ -76,24 +85,21 @@
     background:#f5f7fb;
   `;
 
-  // ===== INPUT AREA =====
+  // ===== INPUT =====
   const inputArea = document.createElement("div");
   inputArea.style = `
     display:flex;
     padding:10px;
     border-top:1px solid #eee;
-    background:white;
   `;
 
   const input = document.createElement("input");
   input.placeholder = "Type your message...";
   input.style = `
     flex:1;
-    padding:10px 12px;
+    padding:10px;
     border-radius:10px;
     border:1px solid #ddd;
-    outline:none;
-    font-size:14px;
   `;
 
   const btn = document.createElement("button");
@@ -106,7 +112,6 @@
     background:${color};
     color:white;
     cursor:pointer;
-    font-size:16px;
   `;
 
   inputArea.appendChild(input);
@@ -121,6 +126,10 @@
   // ===== FUNCTIONS =====
   function toggleChat() {
     box.style.display = box.style.display === "flex" ? "none" : "flex";
+
+    if (box.style.display === "flex" && messages.childElementCount === 0) {
+      addMessage("Hi! How can I help you today?", "bot");
+    }
   }
 
   bubble.onclick = toggleChat;
@@ -128,21 +137,61 @@
   function addMessage(text, type) {
     const msg = document.createElement("div");
 
-    msg.innerText = text;
-
     msg.style = `
-      padding:10px 12px;
-      border-radius:12px;
-      max-width:75%;
-      font-size:14px;
-      line-height:1.4;
-      ${type === "user"
-        ? `background:${color};color:white;align-self:flex-end;`
-        : `background:white;border:1px solid #eee;align-self:flex-start;`}
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      max-width:80%;
+      ${type === "user" ? "align-self:flex-end;" : ""}
     `;
 
+    if (type === "bot") {
+      const avatar = document.createElement("div");
+      avatar.innerHTML = "AI";
+      avatar.style = `
+        width:28px;
+        height:28px;
+        border-radius:50%;
+        background:${color};
+        color:white;
+        font-size:12px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      `;
+      msg.appendChild(avatar);
+    }
+
+    const bubble = document.createElement("div");
+    bubble.innerText = text;
+
+    bubble.style = `
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      background:${type === "user" ? color : "white"};
+      color:${type === "user" ? "white" : "black"};
+      border:${type === "bot" ? "1px solid #eee" : "none"};
+    `;
+
+    msg.appendChild(bubble);
     messages.appendChild(msg);
+
     msg.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function showTyping() {
+    const wrapper = document.createElement("div");
+    wrapper.style = "display:flex;gap:6px;align-items:center;";
+
+    const dots = document.createElement("div");
+    dots.innerHTML = "● ● ●";
+    dots.style = "opacity:0.5;";
+
+    wrapper.appendChild(dots);
+    messages.appendChild(wrapper);
+
+    return wrapper;
   }
 
   async function sendMessage() {
@@ -152,16 +201,7 @@
     addMessage(text, "user");
     input.value = "";
 
-    const typing = document.createElement("div");
-    typing.innerText = "Typing...";
-    typing.style = `
-      padding:10px;
-      border-radius:12px;
-      background:white;
-      border:1px solid #eee;
-      width:fit-content;
-    `;
-    messages.appendChild(typing);
+    const typing = showTyping();
 
     try {
       const res = await fetch(webhook, {
@@ -178,15 +218,15 @@
       typing.remove();
       addMessage(data.reply || "No response", "bot");
 
-    } catch (err) {
+    } catch {
       typing.remove();
-      addMessage("Connection error", "bot");
+      addMessage("Error connecting", "bot");
     }
   }
 
   btn.onclick = sendMessage;
 
-  input.addEventListener("keypress", function (e) {
+  input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
