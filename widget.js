@@ -5,6 +5,7 @@
 
   // 🔥 ROUTE (AUTO-ROUTING STATE)
   let userRoute = null;
+  let askedQuestions = new Set(); // New
 
   // ===== BUBBLE =====
   const bubble = document.createElement("div");
