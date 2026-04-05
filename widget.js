@@ -5,13 +5,15 @@
 
   // ===== BUBBLE =====
   const bubble = document.createElement("div");
-  bubble.innerHTML = "✦";
+  bubble.innerHTML = "Chat here";
   bubble.style = `
     position:fixed; bottom:20px; right:20px;
-    width:60px; height:60px; border-radius:50%;
+    height:60px;
+    padding:0 18px;
+    border-radius:30px;
     background:black; color:white;
     display:flex; justify-content:center; align-items:center;
-    cursor:pointer; font-size:20px;
+    cursor:pointer; font-size:14px; font-weight:500;
     box-shadow:0 8px 20px rgba(0,0,0,0.2);
     z-index:9999;
   `;
@@ -187,7 +189,6 @@
 
       addMessage(reply, "bot");
 
-      // 🔥 RE-ADD SMART OPTIONS AFTER RESPONSE
       addQuickReplies([
         "Book appointment",
         "See pricing",
@@ -212,7 +213,6 @@
     if (box.style.display === "flex" && messages.childElementCount === 0) {
       addMessage("Hi! How can I help you today?", "bot");
 
-      // 🔥 INITIAL OPTIONS
       addQuickReplies([
         "Book an appointment",
         "Botox / Fillers",
