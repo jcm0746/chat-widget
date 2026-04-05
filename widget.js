@@ -3,13 +3,15 @@
   const webhook = "https://joemeeter.app.n8n.cloud/webhook/chatbot";
   const sessionId = Math.random().toString(36).substring(2);
 
+  // 🔥 ROUTE (AUTO-ROUTING STATE)
+  let userRoute = null;
+
   // ===== BUBBLE =====
   const bubble = document.createElement("div");
-  bubble.innerHTML = "Chat here";
+  bubble.innerHTML = "Chat here!";
   bubble.style = `
     position:fixed; bottom:20px; right:20px;
-    height:60px;
-    padding:0 18px;
+    height:60px; padding:0 18px;
     border-radius:30px;
     background:black; color:white;
     display:flex; justify-content:center; align-items:center;
@@ -76,6 +78,44 @@
     msg.scrollIntoView({ behavior: "smooth" });
   }
 
+  // ===== ROUTE OPTIONS (DYNAMIC FLOW) =====
+  function getRouteOptions() {
+    if (userRoute === "botox") {
+      return [
+        "Forehead lines",
+        "Lip filler",
+        "How long does it last?",
+        "Book consultation"
+      ];
+    }
+
+    if (userRoute === "skin") {
+      return [
+        "Acne",
+        "Anti-aging",
+        "Hyperpigmentation",
+        "Book consultation"
+      ];
+    }
+
+    if (userRoute === "booking") {
+      return [
+        "This week",
+        "Next week",
+        "Talk to staff",
+        "Cancel"
+      ];
+    }
+
+    return [
+      "Book appointment",
+      "Botox / Fillers",
+      "Pricing",
+      "Skin treatments",
+      "Talk to someone"
+    ];
+  }
+
   // ===== QUICK REPLIES =====
   function addQuickReplies(options) {
     const container = document.createElement("div");
@@ -110,6 +150,14 @@
 
       btn.onclick = () => {
         addMessage(option, "user");
+
+        // 🔥 AUTO-ROUTING LOGIC
+        const lower = option.toLowerCase();
+
+        if (lower.includes("botox") || lower.includes("filler")) userRoute = "botox";
+        else if (lower.includes("skin") || lower.includes("acne")) userRoute = "skin";
+        else if (lower.includes("book")) userRoute = "booking";
+
         container.remove();
         sendMessage(option);
       };
@@ -173,7 +221,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: text,
-          session_id: sessionId
+          session_id: sessionId,
+          route: userRoute // 🔥 SEND ROUTE TO N8N
         })
       });
 
@@ -189,11 +238,8 @@
 
       addMessage(reply, "bot");
 
-      addQuickReplies([
-        "Book appointment",
-        "See pricing",
-        "Ask another question"
-      ]);
+      // 🔥 DYNAMIC OPTIONS BASED ON ROUTE
+      addQuickReplies(getRouteOptions());
 
     } catch (err) {
       typing.remove();
@@ -213,13 +259,8 @@
     if (box.style.display === "flex" && messages.childElementCount === 0) {
       addMessage("Hi! How can I help you today?", "bot");
 
-      addQuickReplies([
-        "Book an appointment",
-        "Botox / Fillers",
-        "Pricing",
-        "Skin treatments",
-        "Talk to someone"
-      ]);
+      // 🔥 FIRST STEP = ENTRY ROUTING
+      addQuickReplies(getRouteOptions());
     }
   }
 
