@@ -3,9 +3,9 @@
   const webhook = "https://joemeeter.app.n8n.cloud/webhook/chatbot";
   const sessionId = Math.random().toString(36).substring(2);
 
-  // 🔥 ROUTE (AUTO-ROUTING STATE)
+  // 🔥 STATE
   let userRoute = null;
-  let askedQuestions = new Set(); // New
+  let askedQuestions = new Set();
 
   // ===== BUBBLE =====
   const bubble = document.createElement("div");
@@ -79,42 +79,50 @@
     msg.scrollIntoView({ behavior: "smooth" });
   }
 
-  // ===== ROUTE OPTIONS (DYNAMIC FLOW) =====
+  // ===== ROUTE OPTIONS =====
   function getRouteOptions() {
+    let options = [];
+
     if (userRoute === "botox") {
-      return [
+      options = [
         "Forehead lines",
         "Lip filler",
         "How long does it last?",
         "Book consultation"
       ];
-    }
-
-    if (userRoute === "skin") {
-      return [
+    } else if (userRoute === "skin") {
+      options = [
         "Acne",
         "Anti-aging",
         "Hyperpigmentation",
         "Book consultation"
       ];
-    }
-
-    if (userRoute === "booking") {
-      return [
+    } else if (userRoute === "booking") {
+      options = [
         "This week",
         "Next week",
         "Talk to staff",
         "Cancel"
       ];
+    } else {
+      options = [
+        "Book appointment",
+        "Botox / Fillers",
+        "Pricing",
+        "Skin treatments",
+        "Talk to someone"
+      ];
     }
 
-    return [
-      "Book appointment",
-      "Botox / Fillers",
-      "Pricing",
-      "Skin treatments",
-      "Talk to someone"
-    ];
+    // ❌ REMOVE USED OPTIONS
+    options = options.filter(opt => !askedQuestions.has(opt.toLowerCase()));
+
+    // 🔥 FALLBACK AFTER 2 CLICKS
+    if (askedQuestions.size >= 2) {
+      return ["Book consultation", "Talk to someone"];
+    }
+
+    return options;
   }
 
   // ===== QUICK REPLIES =====
@@ -152,9 +160,11 @@
       btn.onclick = () => {
         addMessage(option, "user");
 
-        // 🔥 AUTO-ROUTING LOGIC
-        const lower = option.toLowerCase();
+        // 🔥 TRACK QUESTION
+        askedQuestions.add(option.toLowerCase());
 
+        // 🔥 AUTO ROUTING
+        const lower = option.toLowerCase();
         if (lower.includes("botox") || lower.includes("filler")) userRoute = "botox";
         else if (lower.includes("skin") || lower.includes("acne")) userRoute = "skin";
         else if (lower.includes("book")) userRoute = "booking";
@@ -223,7 +233,7 @@
         body: JSON.stringify({
           message: text,
           session_id: sessionId,
-          route: userRoute // 🔥 SEND ROUTE TO N8N
+          route: userRoute
         })
       });
 
@@ -239,7 +249,7 @@
 
       addMessage(reply, "bot");
 
-      // 🔥 DYNAMIC OPTIONS BASED ON ROUTE
+      // 🔥 NEXT STEP OPTIONS
       addQuickReplies(getRouteOptions());
 
     } catch (err) {
@@ -253,14 +263,12 @@
     if (e.key === "Enter") sendMessage();
   });
 
-  // ===== TOGGLE CHAT =====
+  // ===== TOGGLE =====
   function toggleChat() {
     box.style.display = box.style.display === "flex" ? "none" : "flex";
 
     if (box.style.display === "flex" && messages.childElementCount === 0) {
       addMessage("Hi! How can I help you today?", "bot");
-
-      // 🔥 FIRST STEP = ENTRY ROUTING
       addQuickReplies(getRouteOptions());
     }
   }
