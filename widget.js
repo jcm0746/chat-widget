@@ -213,7 +213,7 @@ style.innerHTML = `     @keyframes blink {
   `;
 document.head.appendChild(style);
 
-// ===== SEND MESSAGE (UPDATED WITH EMBED) =====
+// ===== SEND MESSAGE =====
 async function sendMessage(forcedText = null) {
 const text = forcedText || input.value;
 if (!text) return;
@@ -249,7 +249,7 @@ try {
 
   addMessage(reply, "bot");
 
-  // 🔥 EMBED TALLY FORM
+  // 🔥 EMBED FORM
   if (data.action === "book" && data.booking_url) {
     if (!document.querySelector(".tally-embed")) {
       const iframe = document.createElement("iframe");
